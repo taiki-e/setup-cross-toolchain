@@ -53,6 +53,7 @@ if [[ $# -gt 0 ]]; then
 fi
 
 target="${INPUT_TARGET:?}"
+packages="${INPUT_PACKAGES:-}"
 runner="${INPUT_RUNNER:-}"
 
 host=$(rustc -vV | grep '^host:' | cut -d' ' -f2)
@@ -548,6 +549,7 @@ EOF
                         wine_root=/opt/wine-arm64
                         wine_exe="${wine_root}"/bin/wine
                         qemu_arch=aarch64
+                        _sudo dpkg --add-architecture arm64
                         if [[ -n "${INPUT_WINE:-}" ]]; then
                             warn "specifying Wine version for aarch64 windows is not yet supported"
                         fi
@@ -763,6 +765,35 @@ EOF
         install_qemu
         register_binfmt qemu-user
     fi
+
+    case "${target}" in
+        aarch64* | arm64*) dpkg_arch=arm64 ;;
+        arm* | thumb*) dpkg_arch=arm ;;
+        i?86-*) dpkg_arch=i386 ;;
+        hexagon-*) dpkg_arch=hexagon ;;
+        loongarch64-*) dpkg_arch=loongarch64 ;;
+        m68k-*) dpkg_arch=m68k ;;
+        mips-* | mipsel-*) dpkg_arch="${target%%-*}" ;;
+        mips64-* | mips64el-*) dpkg_arch="${target%%-*}" ;;
+        mipsisa32r6-* | mipsisa32r6el-*) dpkg_arch="${target%%-*}" ;;
+        mipsisa64r6-* | mipsisa64r6el-*) dpkg_arch="${target%%-*}" ;;
+        powerpc-*spe) dpkg_arch=ppc ;;
+        powerpc-*) dpkg_arch=ppc ;;
+        powerpc64-* | powerpc64le-*) dpkg_arch="${target%%-*}" ;;
+        riscv32*) dpkg_arch=riscv32 ;;
+        riscv64*) dpkg_arch=riscv64 ;;
+        s390x-*) dpkg_arch=s390x ;;
+        sparc-*) dpkg_arch=sparc ;;
+        sparc64-* | sparcv9-*) dpkg_arch=sparc64 ;;
+        x86_64*) dpkg_arch=amd64 ;;
+        *) bail "unrecognized target '${target}'" ;;
+    esac
+
+    while read -rd,; do
+    if [[ -n "${REPLY}" ]]; then
+        apt_packages+=("${REPLY}:${dpkg_arch}")
+    fi
+    done <<<"${packages//[$' \t\n']/,},"
 
     install_apt_packages
 
