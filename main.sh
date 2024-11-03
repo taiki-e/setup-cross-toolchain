@@ -788,7 +788,7 @@ EOF
             _sudo rm -rf "${toolchain_dir:?}/${apt_target}/lib64"
             _sudo ln -s lib32 "${toolchain_dir}/${apt_target}/lib"
             gcc_version="$("${apt_target}"-gcc --version | sed -n '1 s/^.*) //p')"
-            common_flags="-m32 -mv8plus -L${toolchain_dir}/${apt_target}/lib32 -L${toolchain_dir}/${apt_target}/lib/gcc-cross/${apt_target}/${gcc_version}/32"
+            common_flags="-mcpu=v9 -m32 -L${toolchain_dir}/${apt_target}/lib32 -L${toolchain_dir}/${apt_target}/lib/gcc-cross/${apt_target}/${gcc_version}/32"
             cat >"/usr/local/bin/${target}-gcc" <<EOF2
 #!/bin/sh
 set -eu

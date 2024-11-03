@@ -15,6 +15,7 @@ target="${target%@*}"
 target_lower="${target//-/_}"
 target_lower="${target_lower//./_}"
 target_upper=$(tr '[:lower:]' '[:upper:]' <<<"${target_lower}")
+target_spec="$(pwd)/${target}.json"
 wd="$2"
 base_rustflags="${RUSTFLAGS:-}"
 case "${target}" in
@@ -57,16 +58,16 @@ skip_run() {
 }
 cargo_run() {
     if skip_run; then
-        cargo ${BUILD_STD:-} build -v --target "${target}" ${cargo_options[@]+"${cargo_options[@]}"} "$@"
+        cargo ${BUILD_STD:-} build -v --target "${target_spec}" ${cargo_options[@]+"${cargo_options[@]}"} "$@"
     else
-        cargo ${BUILD_STD:-} run -v --target "${target}" ${cargo_options[@]+"${cargo_options[@]}"} "$@"
+        cargo ${BUILD_STD:-} run -v --target "${target_spec}" ${cargo_options[@]+"${cargo_options[@]}"} "$@"
     fi
 }
 cargo_test() {
     if skip_run; then
-        cargo ${BUILD_STD:-} test --no-run -v --target "${target}" ${DOCTEST_XCOMPILE:-} ${cargo_options[@]+"${cargo_options[@]}"} "$@"
+        cargo ${BUILD_STD:-} test --no-run -v --target "${target_spec}" ${DOCTEST_XCOMPILE:-} ${cargo_options[@]+"${cargo_options[@]}"} "$@"
     else
-        cargo ${BUILD_STD:-} test -v --target "${target}" ${DOCTEST_XCOMPILE:-} ${cargo_options[@]+"${cargo_options[@]}"} "$@"
+        cargo ${BUILD_STD:-} test -v --target "${target_spec}" ${DOCTEST_XCOMPILE:-} ${cargo_options[@]+"${cargo_options[@]}"} "$@"
     fi
 }
 run_native() {
