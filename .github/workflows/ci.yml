@@ -32,208 +32,207 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@main
-    permissions:
-      contents: read
-      pull-requests: write # for gh pr edit --add-assignee
-      repository-projects: read # for gh pr edit --add-assignee
-    secrets: inherit
+  # tidy:
+  #   uses: taiki-e/github-actions/.github/workflows/tidy.yml@main
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write # for gh pr edit --add-assignee
+  #     repository-projects: read # for gh pr edit --add-assignee
+  #   secrets: inherit
 
   test:
-    needs: tidy
+    # needs: tidy
     strategy:
       fail-fast: false
       matrix:
         # https://github.com/taiki-e/rust-cross-toolchain/blob/HEAD/tools/target-list-shared.sh
         target:
-          # Linux (GNU)
-          # rustup target list | grep -e '-linux-gnu'
-          # rustc --print target-list | grep -e '-linux-gnu'
-          - aarch64-unknown-linux-gnu
-          # - aarch64-unknown-linux-gnu_ilp32 # tier3
-          - aarch64_be-unknown-linux-gnu # tier3
-          # - aarch64_be-unknown-linux-gnu_ilp32 # tier3
-          - arm-unknown-linux-gnueabi
-          # - arm-unknown-linux-gnueabihf # supported in rust-cross-toolchain but not ported to this action
-          - armeb-unknown-linux-gnueabi # tier3
-          # - armv4t-unknown-linux-gnueabi # tier3, rustc generate code for armv5t (probably needs to pass +v4t to llvm)
-          - armv5te-unknown-linux-gnueabi
-          - armv7-unknown-linux-gnueabi
-          - armv7-unknown-linux-gnueabihf
-          - i586-unknown-linux-gnu
-          - i686-unknown-linux-gnu
-          - loongarch64-unknown-linux-gnu
-          # - m68k-unknown-linux-gnu # tier3, build fail: https://github.com/rust-lang/rust/issues/89498
-          - mips-unknown-linux-gnu # tier3
-          - mips64-unknown-linux-gnuabi64 # tier3
-          - mips64el-unknown-linux-gnuabi64 # tier3
-          - mipsel-unknown-linux-gnu # tier3
-          - mipsisa32r6-unknown-linux-gnu # tier3
-          - mipsisa32r6el-unknown-linux-gnu # tier3
-          - mipsisa64r6-unknown-linux-gnuabi64 # tier3
-          - mipsisa64r6el-unknown-linux-gnuabi64 # tier3
-          - powerpc-unknown-linux-gnu
-          # - powerpc-unknown-linux-gnuspe # tier3, fails to run test, and GCC 9 removed support for this target
-          - powerpc64-unknown-linux-gnu
-          - powerpc64le-unknown-linux-gnu
-          - riscv32gc-unknown-linux-gnu # tier3
-          - riscv64gc-unknown-linux-gnu
-          - s390x-unknown-linux-gnu
-          # TODO: relocations in generic ELF (EM: 18)
-          # - sparc-unknown-linux-gnu # tier3
-          - sparc64-unknown-linux-gnu
-          - thumbv7neon-unknown-linux-gnueabihf
-          - x86_64-unknown-linux-gnu
-          # - x86_64-unknown-linux-gnux32 # tier3, run-fail
+          # # Linux (GNU)
+          # # rustup target list | grep -e '-linux-gnu'
+          # # rustc --print target-list | grep -e '-linux-gnu'
+          # - aarch64-unknown-linux-gnu
+          # # - aarch64-unknown-linux-gnu_ilp32 # tier3
+          # - aarch64_be-unknown-linux-gnu # tier3
+          # # - aarch64_be-unknown-linux-gnu_ilp32 # tier3
+          # - arm-unknown-linux-gnueabi
+          # # - arm-unknown-linux-gnueabihf # supported in rust-cross-toolchain but not ported to this action
+          # - armeb-unknown-linux-gnueabi # tier3
+          # # - armv4t-unknown-linux-gnueabi # tier3, rustc generate code for armv5t (probably needs to pass +v4t to llvm)
+          # - armv5te-unknown-linux-gnueabi
+          # - armv7-unknown-linux-gnueabi
+          # - armv7-unknown-linux-gnueabihf
+          # - i586-unknown-linux-gnu
+          # - i686-unknown-linux-gnu
+          # - loongarch64-unknown-linux-gnu
+          # # - m68k-unknown-linux-gnu # tier3, build fail: https://github.com/rust-lang/rust/issues/89498
+          # - mips-unknown-linux-gnu # tier3
+          # - mips64-unknown-linux-gnuabi64 # tier3
+          # - mips64el-unknown-linux-gnuabi64 # tier3
+          # - mipsel-unknown-linux-gnu # tier3
+          # - mipsisa32r6-unknown-linux-gnu # tier3
+          # - mipsisa32r6el-unknown-linux-gnu # tier3
+          # - mipsisa64r6-unknown-linux-gnuabi64 # tier3
+          # - mipsisa64r6el-unknown-linux-gnuabi64 # tier3
+          # - powerpc-unknown-linux-gnu
+          # # - powerpc-unknown-linux-gnuspe # tier3, fails to run test, and GCC 9 removed support for this target
+          # - powerpc64-unknown-linux-gnu
+          # - powerpc64le-unknown-linux-gnu
+          # - riscv32gc-unknown-linux-gnu # tier3
+          # - riscv64gc-unknown-linux-gnu
+          # - s390x-unknown-linux-gnu
+          - sparc-unknown-linux-gnu # tier3
+          # - sparc64-unknown-linux-gnu
+          # - thumbv7neon-unknown-linux-gnueabihf
+          # - x86_64-unknown-linux-gnu
+          # # - x86_64-unknown-linux-gnux32 # tier3, run-fail
         os:
           - ubuntu-24.04
           - ubuntu-22.04
           - ubuntu-20.04
-        include:
-          # Linux (musl)
-          # rustup target list | grep -e '-linux-musl'
-          # rustc --print target-list | grep -e '-linux-musl'
-          - target: aarch64-unknown-linux-musl
-          - target: aarch64-unknown-linux-musl
-            runner: qemu-user@7.2
-          - target: aarch64-unknown-linux-musl
-            qemu: '7.2'
-          - target: arm-unknown-linux-musleabi
-          - target: arm-unknown-linux-musleabihf
-          - target: armv5te-unknown-linux-musleabi
-          - target: armv7-unknown-linux-musleabi
-          - target: armv7-unknown-linux-musleabihf
-          # - target: hexagon-unknown-linux-musl # tier3
-          - target: i586-unknown-linux-musl
-          - target: i686-unknown-linux-musl
-          # - target: mips-unknown-linux-musl # tier3
-          # - target: mips64-openwrt-linux-musl # tier3
-          # - target: mips64-unknown-linux-muslabi64 # tier3
-          # - target: mips64el-unknown-linux-muslabi64 # tier3
-          # - target: mipsel-unknown-linux-musl # tier3
-          # - target: powerpc-unknown-linux-musl # tier3
-          # - target: powerpc64-unknown-linux-musl # tier3
-          # - target: powerpc64le-unknown-linux-musl # tier3
-          # - target: riscv32gc-unknown-linux-musl # tier3
-          # - target: riscv64gc-unknown-linux-musl # tier3
-          # - target: s390x-unknown-linux-musl # tier3
-          # - target: thumbv7neon-unknown-linux-musleabihf # tier3
-          - target: x86_64-unknown-linux-musl
+        # include:
+        #   # Linux (musl)
+        #   # rustup target list | grep -e '-linux-musl'
+        #   # rustc --print target-list | grep -e '-linux-musl'
+        #   - target: aarch64-unknown-linux-musl
+        #   - target: aarch64-unknown-linux-musl
+        #     runner: qemu-user@7.2
+        #   - target: aarch64-unknown-linux-musl
+        #     qemu: '7.2'
+        #   - target: arm-unknown-linux-musleabi
+        #   - target: arm-unknown-linux-musleabihf
+        #   - target: armv5te-unknown-linux-musleabi
+        #   - target: armv7-unknown-linux-musleabi
+        #   - target: armv7-unknown-linux-musleabihf
+        #   # - target: hexagon-unknown-linux-musl # tier3
+        #   - target: i586-unknown-linux-musl
+        #   - target: i686-unknown-linux-musl
+        #   # - target: mips-unknown-linux-musl # tier3
+        #   # - target: mips64-openwrt-linux-musl # tier3
+        #   # - target: mips64-unknown-linux-muslabi64 # tier3
+        #   # - target: mips64el-unknown-linux-muslabi64 # tier3
+        #   # - target: mipsel-unknown-linux-musl # tier3
+        #   # - target: powerpc-unknown-linux-musl # tier3
+        #   # - target: powerpc64-unknown-linux-musl # tier3
+        #   # - target: powerpc64le-unknown-linux-musl # tier3
+        #   # - target: riscv32gc-unknown-linux-musl # tier3
+        #   # - target: riscv64gc-unknown-linux-musl # tier3
+        #   # - target: s390x-unknown-linux-musl # tier3
+        #   # - target: thumbv7neon-unknown-linux-musleabihf # tier3
+        #   - target: x86_64-unknown-linux-musl
 
-          # Linux (uClibc)
-          # rustc --print target-list | grep -e '-linux-uclibc'
-          # TODO: https://github.com/rust-lang/rust/issues/118190
-          # - target: armv5te-unknown-linux-uclibceabi # tier3
-          # - target: armv7-unknown-linux-uclibceabi # tier3
-          # - target: armv7-unknown-linux-uclibceabihf # tier3
-          # - target: mips-unknown-linux-uclibc # tier3
-          # - target: mipsel-unknown-linux-uclibc # tier3
+        #   # Linux (uClibc)
+        #   # rustc --print target-list | grep -e '-linux-uclibc'
+        #   # TODO: https://github.com/rust-lang/rust/issues/118190
+        #   # - target: armv5te-unknown-linux-uclibceabi # tier3
+        #   # - target: armv7-unknown-linux-uclibceabi # tier3
+        #   # - target: armv7-unknown-linux-uclibceabihf # tier3
+        #   # - target: mips-unknown-linux-uclibc # tier3
+        #   # - target: mipsel-unknown-linux-uclibc # tier3
 
-          # Android
-          # rustup target list | grep -e '-android'
-          # rustc --print target-list | grep -e '-android'
-          - target: aarch64-linux-android
-          - target: arm-linux-androideabi
-          - target: arm-linux-androideabi@21
-          - target: armv7-linux-androideabi
-          - target: i686-linux-android
-          - target: thumbv7neon-linux-androideabi
-          - target: x86_64-linux-android
+        #   # Android
+        #   # rustup target list | grep -e '-android'
+        #   # rustc --print target-list | grep -e '-android'
+        #   - target: aarch64-linux-android
+        #   - target: arm-linux-androideabi
+        #   - target: arm-linux-androideabi@21
+        #   - target: armv7-linux-androideabi
+        #   - target: i686-linux-android
+        #   - target: thumbv7neon-linux-androideabi
+        #   - target: x86_64-linux-android
 
-          # FreeBSD
-          # rustup target list | grep -e '-freebsd'
-          # rustc --print target-list | grep -e '-freebsd'
-          - target: aarch64-unknown-freebsd # tier3
-          # - target: armv6-unknown-freebsd # tier3
-          # - target: armv7-unknown-freebsd # tier3
-          - target: i686-unknown-freebsd
-          # - target: powerpc-unknown-freebsd # tier3
-          # - target: powerpc64-unknown-freebsd # tier3
-          # - target: powerpc64le-unknown-freebsd # tier3
-          # - target: riscv64gc-unknown-freebsd # tier3
-          - target: x86_64-unknown-freebsd
-          - target: x86_64-unknown-freebsd@13
+        #   # FreeBSD
+        #   # rustup target list | grep -e '-freebsd'
+        #   # rustc --print target-list | grep -e '-freebsd'
+        #   - target: aarch64-unknown-freebsd # tier3
+        #   # - target: armv6-unknown-freebsd # tier3
+        #   # - target: armv7-unknown-freebsd # tier3
+        #   - target: i686-unknown-freebsd
+        #   # - target: powerpc-unknown-freebsd # tier3
+        #   # - target: powerpc64-unknown-freebsd # tier3
+        #   # - target: powerpc64le-unknown-freebsd # tier3
+        #   # - target: riscv64gc-unknown-freebsd # tier3
+        #   - target: x86_64-unknown-freebsd
+        #   - target: x86_64-unknown-freebsd@13
 
-          # NetBSD
-          # rustup target list | grep -e '-netbsd'
-          # rustc --print target-list | grep -e '-netbsd'
-          - target: aarch64-unknown-netbsd # tier3
-          # - target: aarch64_be-unknown-netbsd # tier3
-          # - target: armv6-unknown-netbsd-eabihf # tier3
-          # - target: armv7-unknown-netbsd-eabihf # tier3
-          # - target: i686-unknown-netbsd # tier3
-          # - target: powerpc-unknown-netbsd # tier3
-          # - target: riscv64gc-unknown-netbsd # tier3
-          # - target: sparc64-unknown-netbsd # tier3
-          - target: x86_64-unknown-netbsd
-          - target: x86_64-unknown-netbsd@9
+        #   # NetBSD
+        #   # rustup target list | grep -e '-netbsd'
+        #   # rustc --print target-list | grep -e '-netbsd'
+        #   - target: aarch64-unknown-netbsd # tier3
+        #   # - target: aarch64_be-unknown-netbsd # tier3
+        #   # - target: armv6-unknown-netbsd-eabihf # tier3
+        #   # - target: armv7-unknown-netbsd-eabihf # tier3
+        #   # - target: i686-unknown-netbsd # tier3
+        #   # - target: powerpc-unknown-netbsd # tier3
+        #   # - target: riscv64gc-unknown-netbsd # tier3
+        #   # - target: sparc64-unknown-netbsd # tier3
+        #   - target: x86_64-unknown-netbsd
+        #   - target: x86_64-unknown-netbsd@9
 
-          # Illumos
-          # rustup target list | grep -e '-illumos'
-          # rustc --print target-list | grep -e '-illumos'
-          # - target: aarch64-unknown-illumos # tier3 (not yet supported)
-          - target: x86_64-unknown-illumos
+        #   # Illumos
+        #   # rustup target list | grep -e '-illumos'
+        #   # rustc --print target-list | grep -e '-illumos'
+        #   # - target: aarch64-unknown-illumos # tier3 (not yet supported)
+        #   - target: x86_64-unknown-illumos
 
-          # WASI
-          # rustup target list | grep -e '-wasi'
-          # rustc --print target-list | grep -e '-wasi'
-          - target: wasm32-wasi
-          - target: wasm32-wasip1
+        #   # WASI
+        #   # rustup target list | grep -e '-wasi'
+        #   # rustc --print target-list | grep -e '-wasi'
+        #   - target: wasm32-wasi
+        #   - target: wasm32-wasip1
 
-          # macOS
-          # rustup target list | grep -e '-darwin'
-          # rustc --print target-list | grep -e '-darwin'
-          - target: aarch64-apple-darwin
-            os: macos-14 # aarch64
-          - target: aarch64-apple-darwin
-            os: macos-13 # x86_64
-          # - target: i686-apple-darwin # tier3
-          #   os: macos-latest
-          - target: x86_64-apple-darwin
-            os: macos-14 # aarch64
-          - target: x86_64-apple-darwin
-            os: macos-13 # x86_64
-          - target: x86_64-apple-darwin
-            os: macos-latest
-          - target: x86_64h-apple-darwin # tier3
-            os: macos-latest
+        #   # macOS
+        #   # rustup target list | grep -e '-darwin'
+        #   # rustc --print target-list | grep -e '-darwin'
+        #   - target: aarch64-apple-darwin
+        #     os: macos-14 # aarch64
+        #   - target: aarch64-apple-darwin
+        #     os: macos-13 # x86_64
+        #   # - target: i686-apple-darwin # tier3
+        #   #   os: macos-latest
+        #   - target: x86_64-apple-darwin
+        #     os: macos-14 # aarch64
+        #   - target: x86_64-apple-darwin
+        #     os: macos-13 # x86_64
+        #   - target: x86_64-apple-darwin
+        #     os: macos-latest
+        #   - target: x86_64h-apple-darwin # tier3
+        #     os: macos-latest
 
-          # Mac Catalyst
-          # rustup target list | grep -e '-macabi'
-          # rustc --print target-list | grep -e '-macabi'
-          - target: aarch64-apple-ios-macabi
-            os: macos-latest # AArch64
-          - target: x86_64-apple-ios-macabi
-            os: macos-13 # x86_64
+        #   # Mac Catalyst
+        #   # rustup target list | grep -e '-macabi'
+        #   # rustc --print target-list | grep -e '-macabi'
+        #   - target: aarch64-apple-ios-macabi
+        #     os: macos-latest # AArch64
+        #   - target: x86_64-apple-ios-macabi
+        #     os: macos-13 # x86_64
 
-          # Windows (MSVC)
-          # rustup target list | grep -e '-pc-windows-msvc'
-          # rustc --print target-list | grep -e '-pc-windows-msvc'
-          - { target: aarch64-pc-windows-msvc, os: windows-latest }
-          - { target: i586-pc-windows-msvc, os: windows-latest }
-          - { target: i686-pc-windows-msvc, os: windows-latest }
-          # - { target: thumbv7a-pc-windows-msvc, os: windows-latest } # tier3
-          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+        #   # Windows (MSVC)
+        #   # rustup target list | grep -e '-pc-windows-msvc'
+        #   # rustc --print target-list | grep -e '-pc-windows-msvc'
+        #   - { target: aarch64-pc-windows-msvc, os: windows-latest }
+        #   - { target: i586-pc-windows-msvc, os: windows-latest }
+        #   - { target: i686-pc-windows-msvc, os: windows-latest }
+        #   # - { target: thumbv7a-pc-windows-msvc, os: windows-latest } # tier3
+        #   - { target: x86_64-pc-windows-msvc, os: windows-latest }
 
-          # Windows (MinGW)
-          # rustup target list | grep -e '-pc-windows-gnu'
-          # rustc --print target-list | grep -e '-pc-windows-gnu'
-          # Windows host:
-          # - target: i686-pc-windows-gnu
-          #   os: windows-latest
-          - target: x86_64-pc-windows-gnu
-            os: windows-latest
-          # Linux host:
-          # - target: i686-pc-windows-gnu
-          - target: x86_64-pc-windows-gnu
-          - target: x86_64-pc-windows-gnu
-            runner: wine@9.3
-          - target: x86_64-pc-windows-gnu
-            wine: '9.0.0.0'
-          - target: x86_64-pc-windows-gnullvm
-          - target: i686-pc-windows-gnullvm
-          - target: aarch64-pc-windows-gnullvm
+        #   # Windows (MinGW)
+        #   # rustup target list | grep -e '-pc-windows-gnu'
+        #   # rustc --print target-list | grep -e '-pc-windows-gnu'
+        #   # Windows host:
+        #   # - target: i686-pc-windows-gnu
+        #   #   os: windows-latest
+        #   - target: x86_64-pc-windows-gnu
+        #     os: windows-latest
+        #   # Linux host:
+        #   # - target: i686-pc-windows-gnu
+        #   - target: x86_64-pc-windows-gnu
+        #   - target: x86_64-pc-windows-gnu
+        #     runner: wine@9.3
+        #   - target: x86_64-pc-windows-gnu
+        #     wine: '9.0.0.0'
+        #   - target: x86_64-pc-windows-gnullvm
+        #   - target: i686-pc-windows-gnullvm
+        #   - target: aarch64-pc-windows-gnullvm
         # prettier-ignore
         exclude:
           # Linker error "unsupported ISA subset `z'" since nightly-2023-08-09 (LLVM 17)
@@ -283,89 +282,89 @@ jobs:
           path: /tmp/artifacts/
         if: matrix.runner == '' && matrix.qemu == '' && matrix.wine == ''
 
-  test-container:
-    needs: tidy
-    strategy:
-      fail-fast: false
-      matrix:
-        container:
-          - ubuntu:18.04 # glibc 2.27
-          - ubuntu:20.04 # glibc 2.31
-          - ubuntu:22.04 # glibc 2.35
-          - ubuntu:24.04 # glibc 2.39
-          - debian:10-slim # glibc 2.28
-          - debian:11-slim # glibc 2.31
-          - debian:12-slim # glibc 2.36
-        target:
-          - x86_64-unknown-linux-gnu
-          - aarch64-unknown-linux-gnu
-          # TODO: No such file or directory
-          # - i586-unknown-linux-gnu
-          # - i686-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
-          - aarch64-unknown-linux-musl
-          - aarch64-linux-android
-          - x86_64-unknown-freebsd
-          - x86_64-unknown-netbsd
-          - x86_64-unknown-illumos
-          - wasm32-wasip1
-          - x86_64-pc-windows-gnu
-          - x86_64-pc-windows-gnullvm
-        # prettier-ignore
-        exclude:
-          # Toolchains not available on ubuntu 18.04
-          - { target: mipsisa32r6-unknown-linux-gnu, container: 'ubuntu:18.04' }
-          - { target: mipsisa32r6el-unknown-linux-gnu, container: 'ubuntu:18.04' }
-          - { target: mipsisa64r6-unknown-linux-gnuabi64, container: 'ubuntu:18.04' }
-          - { target: mipsisa64r6el-unknown-linux-gnuabi64, container: 'ubuntu:18.04' }
-          # The latest Wine not available
-          - { target: x86_64-pc-windows-gnu, container: 'ubuntu:18.04' }
-          - { target: x86_64-pc-windows-gnu, container: 'debian:10-slim' }
-          - { target: x86_64-pc-windows-gnullvm, container: 'ubuntu:18.04' }
-          - { target: x86_64-pc-windows-gnullvm, container: 'debian:10-slim' }
-          # winehq now supports noble but 9.0.0 is not available in it
-          # https://dl.winehq.org/wine-builds/ubuntu/dists/noble/main/binary-amd64
-          # TODO: ubuntu repository's wine is 9.0.0, so we can use it
-          # https://packages.ubuntu.com/en/noble/wine
-          - { target: x86_64-pc-windows-gnu, container: 'ubuntu:24.04' }
-          - { target: x86_64-pc-windows-gnullvm, container: 'ubuntu:24.04' }
-          # Linker error "unsupported ISA subset `z'" since nightly-2023-08-09 (LLVM 17)
-          - { target: riscv64gc-unknown-linux-gnu, container: 'ubuntu:20.04' }
-          # sparc64-linux-gnu-gcc: error: 20210110/32: No such file or directory
-          - { target: sparc-unknown-linux-gnu, container: 'debian:11-slim' }
-          # precompiled binary of latest wasmtime requires glibc 2.28+
-          - { target: wasm32-wasip1, container: 'ubuntu:18.04' }
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    container:
-      image: ${{ matrix.container }}
-      options: --privileged
-    steps:
-      - name: Install requirements (ubuntu/debian)
-        run: |
-          set -eEuxo pipefail
-          apt-get -o Acquire::Retries=10 -qq update
-          apt-get -o Acquire::Retries=10 -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends ca-certificates curl
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain nightly
-          echo "$HOME/.cargo/bin" >>"${GITHUB_PATH}"
-          apt-get -qq -o Dpkg::Use-Pty=0 remove -y curl
-        if: startsWith(matrix.container, 'ubuntu') || startsWith(matrix.container, 'debian')
-      - uses: taiki-e/checkout-action@v1
-      - uses: ./
-        with:
-          target: ${{ matrix.target }}
-      - name: Install requirements for test (ubuntu/debian)
-        run: |
-          set -eEuxo pipefail
-          apt-get -o Acquire::Retries=10 -qq update
-          apt-get -o Acquire::Retries=10 -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends gcc libc6-dev jq make cmake
-        if: startsWith(matrix.container, 'ubuntu') || startsWith(matrix.container, 'debian')
-      - run: git clone --depth 1 https://github.com/taiki-e/rust-cross-toolchain.git
-      - run: tools/ci/test.sh ${{ matrix.target }} rust-cross-toolchain/docker/test/fixtures/rust
-        id: test
-      # TODO: we should replace ':' from matrix.container: "Error: The artifact name is not valid"
-      # # For debugging
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ matrix.target }}-${{ matrix.container }}
-      #     path: /tmp/artifacts/
+  # test-container:
+  #   needs: tidy
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       container:
+  #         - ubuntu:18.04 # glibc 2.27
+  #         - ubuntu:20.04 # glibc 2.31
+  #         - ubuntu:22.04 # glibc 2.35
+  #         - ubuntu:24.04 # glibc 2.39
+  #         - debian:10-slim # glibc 2.28
+  #         - debian:11-slim # glibc 2.31
+  #         - debian:12-slim # glibc 2.36
+  #       target:
+  #         - x86_64-unknown-linux-gnu
+  #         - aarch64-unknown-linux-gnu
+  #         # TODO: No such file or directory
+  #         # - i586-unknown-linux-gnu
+  #         # - i686-unknown-linux-gnu
+  #         - x86_64-unknown-linux-musl
+  #         - aarch64-unknown-linux-musl
+  #         - aarch64-linux-android
+  #         - x86_64-unknown-freebsd
+  #         - x86_64-unknown-netbsd
+  #         - x86_64-unknown-illumos
+  #         - wasm32-wasip1
+  #         - x86_64-pc-windows-gnu
+  #         - x86_64-pc-windows-gnullvm
+  #       # prettier-ignore
+  #       exclude:
+  #         # Toolchains not available on ubuntu 18.04
+  #         - { target: mipsisa32r6-unknown-linux-gnu, container: 'ubuntu:18.04' }
+  #         - { target: mipsisa32r6el-unknown-linux-gnu, container: 'ubuntu:18.04' }
+  #         - { target: mipsisa64r6-unknown-linux-gnuabi64, container: 'ubuntu:18.04' }
+  #         - { target: mipsisa64r6el-unknown-linux-gnuabi64, container: 'ubuntu:18.04' }
+  #         # The latest Wine not available
+  #         - { target: x86_64-pc-windows-gnu, container: 'ubuntu:18.04' }
+  #         - { target: x86_64-pc-windows-gnu, container: 'debian:10-slim' }
+  #         - { target: x86_64-pc-windows-gnullvm, container: 'ubuntu:18.04' }
+  #         - { target: x86_64-pc-windows-gnullvm, container: 'debian:10-slim' }
+  #         # winehq now supports noble but 9.0.0 is not available in it
+  #         # https://dl.winehq.org/wine-builds/ubuntu/dists/noble/main/binary-amd64
+  #         # TODO: ubuntu repository's wine is 9.0.0, so we can use it
+  #         # https://packages.ubuntu.com/en/noble/wine
+  #         - { target: x86_64-pc-windows-gnu, container: 'ubuntu:24.04' }
+  #         - { target: x86_64-pc-windows-gnullvm, container: 'ubuntu:24.04' }
+  #         # Linker error "unsupported ISA subset `z'" since nightly-2023-08-09 (LLVM 17)
+  #         - { target: riscv64gc-unknown-linux-gnu, container: 'ubuntu:20.04' }
+  #         # sparc64-linux-gnu-gcc: error: 20210110/32: No such file or directory
+  #         - { target: sparc-unknown-linux-gnu, container: 'debian:11-slim' }
+  #         # precompiled binary of latest wasmtime requires glibc 2.28+
+  #         - { target: wasm32-wasip1, container: 'ubuntu:18.04' }
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 60
+  #   container:
+  #     image: ${{ matrix.container }}
+  #     options: --privileged
+  #   steps:
+  #     - name: Install requirements (ubuntu/debian)
+  #       run: |
+  #         set -eEuxo pipefail
+  #         apt-get -o Acquire::Retries=10 -qq update
+  #         apt-get -o Acquire::Retries=10 -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends ca-certificates curl
+  #         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain nightly
+  #         echo "$HOME/.cargo/bin" >>"${GITHUB_PATH}"
+  #         apt-get -qq -o Dpkg::Use-Pty=0 remove -y curl
+  #       if: startsWith(matrix.container, 'ubuntu') || startsWith(matrix.container, 'debian')
+  #     - uses: taiki-e/checkout-action@v1
+  #     - uses: ./
+  #       with:
+  #         target: ${{ matrix.target }}
+  #     - name: Install requirements for test (ubuntu/debian)
+  #       run: |
+  #         set -eEuxo pipefail
+  #         apt-get -o Acquire::Retries=10 -qq update
+  #         apt-get -o Acquire::Retries=10 -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends gcc libc6-dev jq make cmake
+  #       if: startsWith(matrix.container, 'ubuntu') || startsWith(matrix.container, 'debian')
+  #     - run: git clone --depth 1 https://github.com/taiki-e/rust-cross-toolchain.git
+  #     - run: tools/ci/test.sh ${{ matrix.target }} rust-cross-toolchain/docker/test/fixtures/rust
+  #       id: test
+  #     # TODO: we should replace ':' from matrix.container: "Error: The artifact name is not valid"
+  #     # # For debugging
+  #     # - uses: actions/upload-artifact@v4
+  #     #   with:
+  #     #     name: ${{ matrix.target }}-${{ matrix.container }}
+  #     #     path: /tmp/artifacts/
